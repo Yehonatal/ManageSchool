@@ -14,7 +14,7 @@ public class DatabaseAccess {
         this.userName = userName.toLowerCase();
         this.password = userPsw.toLowerCase();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/manageschool", "sqluser", "password");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/manageschool", "sqluser", "password");
             statement = conn.createStatement();
         } catch (SQLException err) {
             err.printStackTrace();
