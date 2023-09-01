@@ -4,6 +4,7 @@ public class DatabaseAccess {
     private String accessType;
     private String userType;
     private Statement statement;
+    private Connection conn;
     private String userName;
     private String password;
 
@@ -38,19 +39,22 @@ public class DatabaseAccess {
     }
 
     public String selectData(String user, String psw, String table) {
-        ResultSet result;
-        try {
-            result = statement.executeQuery(String.format("SELECT * FROM %s", table));
-            while (result.next()) {
-                String usr = result.getString(user);
-                String pswd = result.getString(psw);
-                if (usr.equals(userName) && pswd.equals(password)) {
-                    return "true";
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    ResultSet result;
+    try {
+        PreparedStatement preparedStatement = conn.prepareStatement(
+                String.format("SELECT * FROM %s WHERE %s = ? AND %s = ?", table, user, psw)
+        );
+        preparedStatement.setString(1, userName);
+        preparedStatement.setString(2, password);
+        result = preparedStatement.executeQuery();
+
+        if (result.next()) {
+            return "true";
         }
-        return "false";
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return "false case 2";
+}
+
 }
