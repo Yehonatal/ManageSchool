@@ -29,4 +29,4 @@ dist-ssr
 *.sw?
 
 *.class
-*mysql-connector-j-8.1.0
+mysql-connector-j-8.1.0.jar
