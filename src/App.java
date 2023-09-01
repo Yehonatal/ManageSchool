@@ -1,80 +1,107 @@
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.*;
-
-import javax.swing.*;
 
 public class App extends JFrame {
-    JButton logBtn;
-    JTextField chooser;
-    JTextField usrField;
-    JTextField pswField;
-    JPanel panel;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JCheckBox adminCheckBox;
+    private JCheckBox studentCheckBox;
+    private JButton loginButton;
 
-    public static String userType;
-    public static String userName;
-    public static String password;
-
-    public App(){
-        setTitle("ManageSchool");
-        setSize(600,300);
+    public App() {
+        setTitle("Login Page");
+        setSize(450, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        chooser = new JTextField(30);
-        usrField = new JTextField(30);
-        pswField = new JTextField(30);
-        logBtn = new JButton("Log In");
+        // Create a panel with GridBagLayout for centering
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
-        panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints con = new GridBagConstraints();
-        con.insets = new Insets(6, 6, 6, 6);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        centerPanel.add(new JLabel("Username:"), gridBagConstraints);
 
-        con.gridx = 0;
-        con.gridy = 0;
-        panel.add(chooser, con);
-        con.gridy = 1;
-        panel.add(usrField, con);
-        con.gridy = 2;
-        panel.add(pswField, con);
-        con.gridy = 3;
-        panel.add(logBtn, con);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        usernameField = new JTextField(20);
+        centerPanel.add(usernameField, gridBagConstraints);
 
-        add(panel);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        centerPanel.add(new JLabel("Password:"), gridBagConstraints);
 
-        logBtn.addActionListener(new ActionListener() {
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        passwordField = new JPasswordField(20);
+        centerPanel.add(passwordField, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        adminCheckBox = new JCheckBox("Admin");
+        studentCheckBox = new JCheckBox("Student");
+        JPanel userTypePanel = new JPanel();
+        userTypePanel.add(adminCheckBox);
+        userTypePanel.add(studentCheckBox);
+        centerPanel.add(userTypePanel, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        loginButton = new JButton("Login");
+        centerPanel.add(loginButton, gridBagConstraints);
+
+        // Add the center panel to the content pane
+        getContentPane().add(centerPanel, BorderLayout.CENTER);
+
+        loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                userType = chooser.getText();
-                userName = usrField.getText();
-                password = pswField.getText();
+                String username = usernameField.getText();
+                char[] passwordChars = passwordField.getPassword();
+                String password = new String(passwordChars);
+                StringBuilder userType = new StringBuilder();
 
-                createLogin();
+                if (adminCheckBox.isSelected()) {
+                    userType.append("admin ");
+                }
+
+                if (studentCheckBox.isSelected()) {
+                    userType.append("student ");
+                }
+
+                if (userType.length() == 0) {
+                    JOptionPane.showMessageDialog(null, "Please select at least one user type.");
+                } else {
+                    DatabaseAccess access = new DatabaseAccess("select", userType.toString().trim(), username, password);
+                    String result = access.dbAccessor();
+
+                    if (result.equals("true")) {
+                        JOptionPane.showMessageDialog(null, "Login Successful!");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Login Failed. Please check your credentials.");
+                    }
+                }
             }
         });
     }
-    
-    public void createLogin() {
-        DatabaseAccess access = new DatabaseAccess("select", userType, userName, password);
-        String check = access.dbAccessor();
-        System.out.println(check);
 
-    }
-
-
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 App app = new App();
                 app.setVisible(true);
             }
         });
-
-       
-
     }
 }
+               
