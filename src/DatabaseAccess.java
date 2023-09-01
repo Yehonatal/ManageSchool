@@ -3,7 +3,6 @@ import java.sql.*;
 public class DatabaseAccess {
     private String accessType;
     private String userType;
-    private Statement statement;
     private Connection conn;
     private String userName;
     private String password;
@@ -15,7 +14,6 @@ public class DatabaseAccess {
         this.password = userPsw.toLowerCase();
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/manageschool", "sqluser", "password");
-            statement = conn.createStatement();
         } catch (SQLException err) {
             err.printStackTrace();
         }
