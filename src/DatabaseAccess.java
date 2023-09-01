@@ -33,7 +33,7 @@ public class DatabaseAccess {
                 }
                 break;
         }
-        return "false case 1";
+        return "false";
     }
 
     public String selectData(String user, String psw, String table) {
@@ -52,7 +52,7 @@ public class DatabaseAccess {
     } catch (SQLException e) {
         e.printStackTrace();
     }
-    return "false case 2";
+    return "false";
 }
 
 }

@@ -87,6 +87,16 @@ public class Login extends JFrame {
 
                     if (result.equals("true")) {
                         JOptionPane.showMessageDialog(null, "Login Successful!");
+
+                        dispose();
+                            // Open the appropriate window based on user type
+                            if (adminCheckBox.isSelected()) {
+                                AdminWindow adminWindow = new AdminWindow();
+                                adminWindow.setVisible(true);
+                            } else if (studentCheckBox.isSelected()) {
+                                StudentWindow studentWindow = new StudentWindow();
+                                studentWindow.setVisible(true);
+                            }
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please check your credentials.");
                     }
