@@ -38,13 +38,15 @@ public class StudentPanel extends JPanel {
 
     private void setupEnrollToCourse() {
         JPanel enrollToCoursePanel = new JPanel(new BorderLayout());
-
         DefaultTableModel availableCoursesTableModel = new DefaultTableModel();
         availableCoursesTableModel.addColumn("Course ID");
         availableCoursesTableModel.addColumn("Course Name");
+        availableCoursesTableModel.addColumn("Credit");
         availableCoursesTable = new JTable(availableCoursesTableModel);
         JScrollPane availableCoursesScrollPane = new JScrollPane(availableCoursesTable);
         enrollToCoursePanel.add(availableCoursesScrollPane, BorderLayout.CENTER);
+
+        availableCoursesTable.setDefaultEditor(Object.class, null);
 
         JPanel enrollFormPanel = new JPanel(new FlowLayout());
         courseCodeField = new JTextField(20);
@@ -72,6 +74,9 @@ public class StudentPanel extends JPanel {
         JScrollPane enrolledCoursesScrollPane = new JScrollPane(enrolledCoursesTable);
         viewGradesPanel.add(enrolledCoursesScrollPane, BorderLayout.CENTER);
 
+        enrolledCoursesTable.setDefaultEditor(Object.class, null);
+
+
         tabbedPane.addTab("View Your Grades", null, viewGradesPanel, "View your grades");
 
         // Populate enrolled courses and grades
@@ -97,8 +102,8 @@ public class StudentPanel extends JPanel {
         // TODO: Implement this method to fetch and populate available courses into the availableCoursesTable
         // Random data for now:
         DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
-        model.addRow(new Object[] {"C001", "Course 1"});
-        model.addRow(new Object[] {"C002", "Course 2"});
+        model.addRow(new Object[] {"C001", "Course 1", "3"});
+        model.addRow(new Object[] {"C002", "Course 2", "4"});
     }
 
     private void populateEnrolledCoursesTable() {
