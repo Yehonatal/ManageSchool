@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,7 @@ public class AdminPanel extends JPanel {
     private JCheckBox studentStatusCheckBox;
 
     // Components for creating courses
+    private JTable availableCoursesTable;
     private JTextField courseNameField;
     private JTextField courseCodeField;
     private JTextField courseCreditField;
@@ -21,7 +23,6 @@ public class AdminPanel extends JPanel {
     private JTextField assignStudentIdField;
     private JTextField assignCourseIdField;
     private JTextField gradeField;
-
 
     public AdminPanel(App app) {
         parentApp = app;
@@ -44,8 +45,6 @@ public class AdminPanel extends JPanel {
         add(createLogoutPanel(), BorderLayout.SOUTH);
     }
 
-    
-
     private void setupAddStudentTab() {
         JPanel addStudentPanel = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Add Students", null, addStudentPanel, "Add Students to Database");
@@ -58,23 +57,62 @@ public class AdminPanel extends JPanel {
         addComponentsToPanel(addStudentPanel, studentNameField, "Student Name:", 0, 0);
         addComponentsToPanel(addStudentPanel, studentIdField, "Student ID:", 0, 1);
         addComponentsToPanel(addStudentPanel, studentStatusCheckBox, "Student Status:", 0, 2);
-        addComponentsToPanel(addStudentPanel, studentStatusCheckBox, 2, 1);
         addComponentsToPanel(addStudentPanel, addStudentButton, 1, 3);
     }
 
     private void setupCreateCoursesTab() {
-        JPanel createCoursePanel = new JPanel(new GridBagLayout());
+        JPanel createCoursePanel = new JPanel(new BorderLayout());
         tabbedPane.addTab("Create Courses", null, createCoursePanel, "Create Courses");
+
+        // Create and set up the available courses table in the "Create Courses" tab
+        DefaultTableModel availableCoursesTableModel = new DefaultTableModel();
+        availableCoursesTableModel.addColumn("Course ID");
+        availableCoursesTableModel.addColumn("Course Name");
+        availableCoursesTableModel.addColumn("Credit");
+        availableCoursesTable = new JTable(availableCoursesTableModel);
+        JScrollPane availableCoursesScrollPane = new JScrollPane(availableCoursesTable);
+
+        // Make the table read-only
+        availableCoursesTable.setDefaultEditor(Object.class, null);
+
+        // Populate available courses
+        populateAvailableCoursesTable();
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(availableCoursesScrollPane, BorderLayout.CENTER);
+
+        // Create a split pane to divide the space vertically
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(1.0); // Make the top component (table) take the whole space
+
+        splitPane.setTopComponent(tablePanel); // Add the table to the top
+        splitPane.setBottomComponent(createCourseFormPanel()); // Add the form to the bottom
+
+        createCoursePanel.add(splitPane, BorderLayout.CENTER);
+    }
+
+    private JPanel createCourseFormPanel() {
+        JPanel formPanel = new JPanel(new GridBagLayout());
 
         courseNameField = createTextField(20);
         courseCodeField = createTextField(20);
         courseCreditField = createTextField(20);
         JButton createCourseButton = createButton("Create Course", e -> createCourse());
 
-        addComponentsToPanel(createCoursePanel, courseNameField, "Course Title:", 0, 0);
-        addComponentsToPanel(createCoursePanel, courseCodeField, "Course Code:", 0, 1);
-        addComponentsToPanel(createCoursePanel, courseCreditField, "Course Credit:", 0, 2);
-        addComponentsToPanel(createCoursePanel, createCourseButton, 1, 3);
+        addComponentsToPanel(formPanel, courseNameField, "Course Title:", 0, 0);
+        addComponentsToPanel(formPanel, courseCodeField, "Course Code:", 0, 1);
+        addComponentsToPanel(formPanel, courseCreditField, "Course Credit:", 0, 2);
+        addComponentsToPanel(formPanel, createCourseButton, 0, 3);
+
+        return formPanel;
+    }
+
+    private void populateAvailableCoursesTable() {
+        // TODO: Implement this method to fetch and populate available courses into the availableCoursesTable
+        // Random data for now:
+        DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
+        model.addRow(new Object[]{"C001", "Course 1", "3"});
+        model.addRow(new Object[]{"C002", "Course 2", "4"});
     }
 
     private void setupAssignGradesTab() {
@@ -131,19 +169,16 @@ public class AdminPanel extends JPanel {
         componentConstraints.fill = GridBagConstraints.HORIZONTAL;
         componentConstraints.anchor = GridBagConstraints.WEST;
 
-        if (component instanceof JTextField || component instanceof JCheckBox) {
-            panel.add(new JLabel(labelText), labelConstraints); 
-            panel.add(component, componentConstraints); 
+        if (component instanceof JScrollPane) {
+            panel.add(component, componentConstraints);
+        } else if (component instanceof JTextField || component instanceof JCheckBox) {
+            panel.add(new JLabel(labelText), labelConstraints);
+            panel.add(component, componentConstraints);
         } else if (component instanceof JButton) {
-            componentConstraints.gridwidth = 2; 
-            panel.add(component, componentConstraints); 
+            componentConstraints.gridwidth = 2;
+            panel.add(component, componentConstraints);
         }
     }
-
-
-
-
-
 
     private JPanel createLogoutPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
