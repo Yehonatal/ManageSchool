@@ -18,13 +18,16 @@ public class AdminPanel extends JPanel {
     private JTextField courseCreditField;
 
     // Components for assigning grades
-    private JTextField assignStudentId;
-    private JTextField assignCourseId;
+    private JTextField assignStudentIdField;
+    private JTextField assignCourseIdField;
     private JTextField gradeField;
 
     public AdminPanel(App app) {
         parentApp = app;
+        setupUI();
+    }
 
+    private void setupUI() {
         setLayout(new BorderLayout());
         JLabel titleLabel = new JLabel("Admin Panel");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -32,211 +35,137 @@ public class AdminPanel extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
+        setupAddStudentTab();
+        setupCreateCoursesTab();
+        setupAssignGradesTab();
 
-        // Tab for adding students
+        add(tabbedPane, BorderLayout.CENTER);
+        add(createLogoutPanel(), BorderLayout.SOUTH);
+    }
+
+    
+
+    private void setupAddStudentTab() {
         JPanel addStudentPanel = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Add Students", null, addStudentPanel, "Add Students to Database");
 
-        // Components for adding students
-        studentNameField = new JTextField(20);
-        studentIdField = new JTextField(20);
+        studentNameField = createTextField(20);
+        studentIdField = createTextField(20);
         studentStatusCheckBox = new JCheckBox("Active");
-        JButton addStudentButton = new JButton("Add Student");
+        JButton addStudentButton = createButton("Add Student", e -> addStudent());
 
-        addStudentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Retrieve student information
-                String studentName = studentNameField.getText();
-                String studentId = studentIdField.getText();
-                Boolean studentActiveStatus = studentStatusCheckBox.isSelected();
+        addComponentsToPanel(addStudentPanel, studentNameField, "Student Name:", 0, 0);
+        addComponentsToPanel(addStudentPanel, studentIdField, "Student ID:", 1, 0);
+        addComponentsToPanel(addStudentPanel, studentStatusCheckBox, "Student Status:", 2, 0);
+        addComponentsToPanel(addStudentPanel, addStudentButton, 1, 3);
+    }
 
-                // TODO: Add code to insert the student data into the StudentLog table
-                // Clear the form fields after adding the student
-                studentNameField.setText("");
-                studentIdField.setText("");
-                studentStatusCheckBox.setSelected(false);
-            }
-        });
-
-        // Add components to addStudentPanel
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        addStudentPanel.add(new JLabel("Student Name:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        addStudentPanel.add(studentNameField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        addStudentPanel.add(new JLabel("Student ID:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        addStudentPanel.add(studentIdField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        addStudentPanel.add(studentStatusCheckBox, gridBagConstraints); // Add the checkbox
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        addStudentPanel.add(addStudentButton, gridBagConstraints);
-
-        // Tab for creating courses
+    private void setupCreateCoursesTab() {
         JPanel createCoursePanel = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Create Courses", null, createCoursePanel, "Create Courses");
 
-        // Components for creating courses
-        courseNameField = new JTextField(20);
-        courseCodeField = new JTextField(20);
-        courseCreditField = new JTextField(20);
-        JButton createCourseButton = new JButton("Create Course");
+        courseNameField = createTextField(20);
+        courseCodeField = createTextField(20);
+        courseCreditField = createTextField(20);
+        JButton createCourseButton = createButton("Create Course", e -> createCourse());
 
-        createCourseButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Retrieve course information
-                String courseName = courseNameField.getText();
-                String courseCode = courseCodeField.getText();
-                String courseCredit = courseCreditField.getText();
+        addComponentsToPanel(createCoursePanel, courseNameField, "Course Title:", 0, 0);
+        addComponentsToPanel(createCoursePanel, courseCodeField, "Course Code:", 1, 0);
+        addComponentsToPanel(createCoursePanel, courseCreditField, "Course Credit:", 2, 0);
+        addComponentsToPanel(createCoursePanel, createCourseButton, 1, 3);
+    }
 
-                // TODO: Add code to insert the course data into the CoursesLog table
-                // Clear the form fields after creating the course
-                courseNameField.setText("");
-                courseCodeField.setText("");
-                courseCreditField.setText("");
-            }
-        });
-
-        // Add components to createCoursePanel
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        createCoursePanel.add(new JLabel("Course Title:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        createCoursePanel.add(courseNameField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        createCoursePanel.add(new JLabel("Course Code:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        createCoursePanel.add(courseCodeField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        createCoursePanel.add(new JLabel("Course Credit:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        createCoursePanel.add(courseCreditField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        createCoursePanel.add(createCourseButton, gridBagConstraints);
-
-        // Tab for assigning grades
+    private void setupAssignGradesTab() {
         JPanel assignGradesPanel = new JPanel(new GridBagLayout());
         tabbedPane.addTab("Assign Grades", null, assignGradesPanel, "Assign Grades to Students");
 
-        // Components for assigning grades
-        assignStudentId = new JTextField(20);
-        assignCourseId = new JTextField(20);
-        gradeField = new JTextField(5);
-        JButton assignGradeButton = new JButton("Assign Grade");
+        assignStudentIdField = createTextField(20);
+        assignCourseIdField = createTextField(20);
+        gradeField = createTextField(5);
+        JButton assignGradeButton = createButton("Assign Grade", e -> assignGrade());
 
-        assignGradeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Retrieve selected student, course, and grade
-                String selectedStudent =  assignStudentId.getText();
-                String selectedCourse = assignCourseId.getText();
-                String grade = gradeField.getText();
+        addComponentsToPanel(assignGradesPanel, assignStudentIdField, "Select Student:", 0, 0);
+        addComponentsToPanel(assignGradesPanel, assignCourseIdField, "Select Course:", 1, 0);
+        addComponentsToPanel(assignGradesPanel, gradeField, "Enter Grade:", 2, 0);
+        addComponentsToPanel(assignGradesPanel, assignGradeButton, 1, 3);
+    }
 
-                // TODO: Add code to update the corresponding course table with the assigned grade
-                // Clear the form fields after assigning the grade
-                gradeField.setText("");
-            }
-        });
+    private JTextField createTextField(int columns) {
+        JTextField textField = new JTextField(columns);
+        textField.setFont(new Font("Arial", Font.PLAIN, 12));
+        return textField;
+    }
 
-        // Add components to assignGradesPanel
+    private JButton createButton(String text, ActionListener actionListener) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.PLAIN, 12));
+        button.addActionListener(actionListener);
+        return button;
+    }
+
+    private void addComponentsToPanel(JPanel panel, JComponent component, String label, int gridx, int gridy) {
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.gridx = gridx;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.fill = (gridy == 3) ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        assignGradesPanel.add(new JLabel("Select Student:"), gridBagConstraints);
+        if (!label.isEmpty()) {
+            panel.add(new JLabel(label), gridBagConstraints);
+            gridBagConstraints.gridx++;
+        }
 
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        assignGradesPanel.add(assignStudentId, gridBagConstraints);
+        panel.add(component, gridBagConstraints);
+    }
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        assignGradesPanel.add(new JLabel("Select Course:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        assignGradesPanel.add(assignCourseId, gridBagConstraints);
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        assignGradesPanel.add(new JLabel("Enter Grade:"), gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        assignGradesPanel.add(gradeField, gridBagConstraints);
-
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        assignGradesPanel.add(assignGradeButton, gridBagConstraints);
-
-        // Add components to assignGradesPanel
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-
-        // Add tabbedPane to the main panel
-        add(tabbedPane, BorderLayout.CENTER);
-
-        // Logout button (unchanged)
+    private JPanel createLogoutPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton logoutButton = new JButton("Logout");
+        JButton logoutButton = createButton("Logout", e -> parentApp.switchPanel(new LoginPanel(parentApp)));
         logoutButton.setPreferredSize(new Dimension(80, 25));
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Switch back to the login panel
-                parentApp.switchPanel(new LoginPanel(parentApp));
-            }
-        });
         buttonPanel.add(logoutButton);
-        add(buttonPanel, BorderLayout.SOUTH);
+        return buttonPanel;
+    }
+
+    private void addStudent() {
+        // Retrieve student information and add to the database
+        String studentName = studentNameField.getText();
+        String studentId = studentIdField.getText();
+        Boolean studentActiveStatus = studentStatusCheckBox.isSelected();
+
+        // TODO: Add code to insert the student data into the StudentLog table
+        // Clear the form fields after adding the student
+        clearFormFields(studentNameField, studentIdField, studentStatusCheckBox);
+    }
+
+    private void createCourse() {
+        // Retrieve course information and add to the database
+        String courseName = courseNameField.getText();
+        String courseCode = courseCodeField.getText();
+        String courseCredit = courseCreditField.getText();
+
+        // TODO: Add code to insert the course data into the CoursesLog table
+        // Clear the form fields after creating the course
+        clearFormFields(courseNameField, courseCodeField, courseCreditField);
+    }
+
+    private void assignGrade() {
+        // Retrieve selected student, course, and grade and update the database
+        String selectedStudent = assignStudentIdField.getText();
+        String selectedCourse = assignCourseIdField.getText();
+        String grade = gradeField.getText();
+
+        // TODO: Add code to update the corresponding course table with the assigned grade
+        // Clear the form fields after assigning the grade
+        clearFormFields(assignStudentIdField, assignCourseIdField, gradeField);
+    }
+
+    private void clearFormFields(Component... components) {
+        for (Component component : components) {
+            if (component instanceof JTextField) {
+                ((JTextField) component).setText("");
+            } else if (component instanceof JCheckBox) {
+                ((JCheckBox) component).setSelected(false);
+            }
+        }
     }
 }
