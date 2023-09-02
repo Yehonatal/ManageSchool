@@ -145,9 +145,11 @@ public class AdminPanel extends JPanel {
         tabbedPane.addTab("Assign Grades", null, assignGradesPanel, "Assign Grades to Students");
 
         DefaultTableModel studentsEnrolledModel = new DefaultTableModel();
-        studentsEnrolledModel.addColumn("Student ID");
         studentsEnrolledModel.addColumn("Student Name");
+        studentsEnrolledModel.addColumn("Student ID");
         studentsEnrolledModel.addColumn("Student Status");
+        studentsEnrolledModel.addColumn("Course Code");
+        studentsEnrolledModel.addColumn("Grade");
         studentsEnrolledTable = new JTable(studentsEnrolledModel);
         JScrollPane enrolledTableScrollPane = new JScrollPane(studentsEnrolledTable);
 
@@ -172,13 +174,17 @@ public class AdminPanel extends JPanel {
         DefaultTableModel studentsEnrolledModel = (DefaultTableModel) studentsEnrolledTable.getModel();
         studentsEnrolledModel.setRowCount(0);
         try {
-            String grabber = "SELECT * FROM studentlog";
+            String grabber = "select studentlog.studentName, studentlog.studentId, studentlog.studentStatus, enrollments.course_id, enrollments.grade from studentlog\n" + //
+                    "inner join enrollments on studentlog.studentId = enrollments.student_id";
             ResultSet resultSet = statement.executeQuery(grabber);
             while (resultSet.next()) {
-                String studentId = resultSet.getString("studentId");
                 String studentName = resultSet.getString("studentName");
+                String studentId = resultSet.getString("studentId");
                 String studentStatus = resultSet.getString("studentStatus");
-                studentsEnrolledModel.addRow(new Object[] {studentId, studentName, studentStatus});
+                String courseId = resultSet.getString("course_id");
+                String grade = resultSet.getString("grade");
+                
+                studentsEnrolledModel.addRow(new Object[] {studentId, studentName, studentStatus, courseId, grade});
             }
         } catch (SQLException e) {
             e.printStackTrace();
