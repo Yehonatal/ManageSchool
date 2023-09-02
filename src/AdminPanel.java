@@ -98,8 +98,8 @@ public class AdminPanel extends JPanel {
         courseCreditField = createTextField(20);
         JButton createCourseButton = createButton("Create Course", e -> createCourse());
 
-        addComponentsToPanel(formPanel, courseNameField, "Course Title:", 0, 0);
-        addComponentsToPanel(formPanel, courseCodeField, "Course Code:", 0, 1);
+        addComponentsToPanel(formPanel, courseNameField, "Course Code:", 0, 0);
+        addComponentsToPanel(formPanel, courseCodeField, "Course Title:", 0, 1);
         addComponentsToPanel(formPanel, courseCreditField, "Course Credit:", 0, 2);
         addComponentsToPanel(formPanel, createCourseButton, 0, 3);
 
@@ -121,6 +121,8 @@ public class AdminPanel extends JPanel {
 
     private void populateAvailableCoursesTable() {
         tablePopulate();
+        DefaultTableModel availableCoursesTableModel = (DefaultTableModel) availableCoursesTable.getModel();
+        availableCoursesTableModel.setRowCount(0);
         try {
             String grabber = "SELECT * FROM courseslog";
             ResultSet resultSet = statement.executeQuery(grabber);
@@ -215,9 +217,21 @@ public class AdminPanel extends JPanel {
         String studentName = studentNameField.getText();
         String studentId = studentIdField.getText();
         Boolean studentActiveStatus = studentStatusCheckBox.isSelected();
+        String status;
+        if (studentActiveStatus){
+            status = "Active";
+        }else{ status = "Disabled"; }
 
         // TODO: Add code to insert the student data into the StudentLog table
-        // Clear the form fields after adding the student
+        tablePopulate();
+        try {
+            String adder = String.format("INSERT INTO studentlog(studentId, studentName, studentStatus) VALUES ('%s', '%s', '%s')",studentId, studentName, status);
+            statement.executeUpdate(adder);            
+            JOptionPane.showMessageDialog(this, "Student successfully added ...  ", "Update complete", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error Inserting data to the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
         clearFormFields(studentNameField, studentIdField, studentStatusCheckBox);
     }
 
@@ -228,7 +242,16 @@ public class AdminPanel extends JPanel {
         String courseCredit = courseCreditField.getText();
 
         // TODO: Add code to insert the course data into the CoursesLog table
-        // Clear the form fields after creating the course
+        tablePopulate();
+        try {
+            String adder = String.format("INSERT INTO courseslog(courseId, courseTitle, courseCredit) VALUES ('%s', '%s', '%s')",courseName, courseCode, courseCredit);
+            statement.executeUpdate(adder);            
+            JOptionPane.showMessageDialog(this, "Course successfully added ...  ", "Update complete", JOptionPane.INFORMATION_MESSAGE);
+            populateAvailableCoursesTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error Inserting data to the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
         clearFormFields(courseNameField, courseCodeField, courseCreditField);
     }
 
