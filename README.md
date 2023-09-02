@@ -1,4 +1,4 @@
-# ManageSchool
+# ManageSchool [Done]
 
 This is a simple Student Management System project with a focus on managing students, courses, and grades.
 
