@@ -23,6 +23,7 @@ public class AdminPanel extends JPanel {
     private JTextField courseCreditField;
 
     // Components for assigning grades
+    private JTable studentsEnrolledTable;
     private JTextField assignStudentIdField;
     private JTextField assignCourseIdField;
     private JTextField gradeField;
@@ -140,18 +141,66 @@ public class AdminPanel extends JPanel {
     }
 
     private void setupAssignGradesTab() {
-        JPanel assignGradesPanel = new JPanel(new GridBagLayout());
+        JPanel assignGradesPanel = new JPanel(new BorderLayout());
         tabbedPane.addTab("Assign Grades", null, assignGradesPanel, "Assign Grades to Students");
+
+        DefaultTableModel studentsEnrolledModel = new DefaultTableModel();
+        studentsEnrolledModel.addColumn("Student ID");
+        studentsEnrolledModel.addColumn("Student Name");
+        studentsEnrolledModel.addColumn("Student Status");
+        studentsEnrolledTable = new JTable(studentsEnrolledModel);
+        JScrollPane enrolledTableScrollPane = new JScrollPane(studentsEnrolledTable);
+
+        studentsEnrolledTable.setDefaultEditor(Object.class, null);
+
+        // Populate enrolled students
+        populateStudentsEnrolledTable();
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(enrolledTableScrollPane, BorderLayout.CENTER);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(1.0);
+
+        splitPane.setTopComponent(tablePanel);
+        splitPane.setBottomComponent(assignGradeFormPanel());
+        assignGradesPanel.add(splitPane, BorderLayout.CENTER);
+    }
+
+    private void populateStudentsEnrolledTable() {
+        tablePopulate();
+        DefaultTableModel studentsEnrolledModel = (DefaultTableModel) studentsEnrolledTable.getModel();
+        studentsEnrolledModel.setRowCount(0);
+        try {
+            String grabber = "SELECT * FROM studentlog";
+            ResultSet resultSet = statement.executeQuery(grabber);
+            while (resultSet.next()) {
+                String studentId = resultSet.getString("studentId");
+                String studentName = resultSet.getString("studentName");
+                String studentStatus = resultSet.getString("studentStatus");
+                studentsEnrolledModel.addRow(new Object[] {studentId, studentName, studentStatus});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching data from the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    private JPanel assignGradeFormPanel(){
+        JPanel formPanel = new JPanel(new GridBagLayout());
 
         assignStudentIdField = createTextField(20);
         assignCourseIdField = createTextField(20);
         gradeField = createTextField(5);
         JButton assignGradeButton = createButton("Assign Grade", e -> assignGrade());
 
-        addComponentsToPanel(assignGradesPanel, assignStudentIdField, "Select Student:", 0, 0);
-        addComponentsToPanel(assignGradesPanel, assignCourseIdField, "Select Course:", 0, 1);
-        addComponentsToPanel(assignGradesPanel, gradeField, "Enter Grade:", 0, 2);
-        addComponentsToPanel(assignGradesPanel, assignGradeButton, 1, 3);
+        addComponentsToPanel(formPanel, assignStudentIdField, "Select Student:", 0, 0);
+        addComponentsToPanel(formPanel, assignCourseIdField, "Select Course:", 0, 1);
+        addComponentsToPanel(formPanel, gradeField, "Enter Grade:", 0, 2);
+        addComponentsToPanel(formPanel, assignGradeButton, 1, 3);
+
+        return formPanel;
     }
 
     private JTextField createTextField(int columns) {
@@ -261,8 +310,17 @@ public class AdminPanel extends JPanel {
         String selectedCourse = assignCourseIdField.getText();
         String grade = gradeField.getText();
 
-        // TODO: Add code to update the corresponding course table with the assigned grade
         // Clear the form fields after assigning the grade
+        tablePopulate();
+        try {
+            String adder = String.format("INSERT INTO enrollments(student_id, course_id, grade) VALUES ('%s', '%s', '%s')",selectedStudent, selectedCourse, grade);
+            statement.executeUpdate(adder);            
+            JOptionPane.showMessageDialog(this, "Grade successfully added ...  ", "Update complete", JOptionPane.INFORMATION_MESSAGE);
+            populateStudentsEnrolledTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error Inserting data to the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
         clearFormFields(assignStudentIdField, assignCourseIdField, gradeField);
     }
 
