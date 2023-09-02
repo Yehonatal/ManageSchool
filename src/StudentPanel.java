@@ -9,6 +9,7 @@ public class StudentPanel extends JPanel {
     private JTabbedPane tabbedPane;
     Connection con;
     Statement statement;
+    String studId;
 
     // Components for enrolling in courses
     private JTable availableCoursesTable;
@@ -18,11 +19,12 @@ public class StudentPanel extends JPanel {
     // Component for viewing enrolled courses and grades
     private JTable enrolledCoursesTable;
 
-    public StudentPanel(App app) {
+    public StudentPanel(App app, String psw) {
+        this.studId = psw;
         parentApp = app;
         setupUI();
     }
-
+    
     private void setupUI() {
         setLayout(new BorderLayout());
         JLabel titleLabel = new JLabel("Student Panel");
@@ -69,8 +71,10 @@ public class StudentPanel extends JPanel {
 
         // Create a table to display enrolled courses and grades
         DefaultTableModel enrolledCoursesTableModel = new DefaultTableModel();
-        enrolledCoursesTableModel.addColumn("Course ID");
-        enrolledCoursesTableModel.addColumn("Course Name");
+        enrolledCoursesTableModel.addColumn("Student Name");
+        enrolledCoursesTableModel.addColumn("Student ID");
+        enrolledCoursesTableModel.addColumn("Student Status");
+        enrolledCoursesTableModel.addColumn("Course Code");
         enrolledCoursesTableModel.addColumn("Grade");
         enrolledCoursesTable = new JTable(enrolledCoursesTableModel);
         JScrollPane enrolledCoursesScrollPane = new JScrollPane(enrolledCoursesTable);
@@ -132,16 +136,40 @@ public class StudentPanel extends JPanel {
     }
 
     private void populateEnrolledCoursesTable() {
-        // TODO: Implement this method to fetch and populate enrolled courses and grades into the enrolledCoursesTable
-        // Random data for now:
-        DefaultTableModel model = (DefaultTableModel) enrolledCoursesTable.getModel();
-        model.addRow(new Object[] {"C001", "Course 1", "A"});
-        model.addRow(new Object[] {"C002", "Course 2", "B"});
+        tablePopulate();
+        DefaultTableModel studentsEnrolledModel = (DefaultTableModel) enrolledCoursesTable.getModel();
+        studentsEnrolledModel.setRowCount(0);
+        try {
+            String grabber = String.format("select studentlog.studentName, studentlog.studentId, studentlog.studentStatus, enrollments.course_id, enrollments.grade from studentlog inner join enrollments on studentlog.studentId = enrollments.student_id where studentlog.studentId = " + "'%S'", studId) ;
+            ResultSet resultSet = statement.executeQuery(grabber);
+            while (resultSet.next()) {
+                String studentName = resultSet.getString("studentName");
+                String studentId = resultSet.getString("studentId");
+                String studentStatus = resultSet.getString("studentStatus");
+                String courseId = resultSet.getString("course_id");
+                String grade = resultSet.getString("grade");
+                
+                studentsEnrolledModel.addRow(new Object[] {studentId, studentName, studentStatus, courseId, grade});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching data from the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void enrollInCourse() {
-        // TODO: Implement enroll
+        String courseCode = courseCodeField.getText();
+        tablePopulate();
+        try {
+            String adder = String.format("INSERT INTO enrollments(student_id, course_id) VALUES('%s', '%s')", studId, courseCode);     
+            statement.executeUpdate(adder);       
+            JOptionPane.showMessageDialog(this, "Successfully enrolled ...  ", "Update complete", JOptionPane.INFORMATION_MESSAGE);
+            populateEnrolledCoursesTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error enrolling data to the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
-    
+ 
 }

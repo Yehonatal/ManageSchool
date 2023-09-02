@@ -11,6 +11,12 @@ public class LoginPanel extends JPanel {
     private JButton loginButton;
     private App parentApp;
 
+    String username;
+    char[] passwordChars;
+    String password;
+    StringBuilder userType;
+
+ 
     public LoginPanel(App app) {
         parentApp = app;
 
@@ -61,10 +67,10 @@ public class LoginPanel extends JPanel {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                char[] passwordChars = passwordField.getPassword();
-                String password = new String(passwordChars);
-                StringBuilder userType = new StringBuilder();
+                username = usernameField.getText();
+                passwordChars = passwordField.getPassword();
+                password = new String(passwordChars);
+                userType = new StringBuilder();
 
                 if (adminCheckBox.isSelected()) {
                     userType.append("admin ");
@@ -87,7 +93,7 @@ public class LoginPanel extends JPanel {
                         if (adminCheckBox.isSelected()) {
                             parentApp.switchPanel(new AdminPanel(parentApp));
                         } else if (studentCheckBox.isSelected()) {
-                            parentApp.switchPanel(new StudentPanel(parentApp));
+                            parentApp.switchPanel(new StudentPanel(parentApp, password));
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please check your credentials.");

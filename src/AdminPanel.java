@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 
@@ -277,7 +276,6 @@ public class AdminPanel extends JPanel {
             status = "Active";
         }else{ status = "Disabled"; }
 
-        // TODO: Add code to insert the student data into the StudentLog table
         tablePopulate();
         try {
             String adder = String.format("INSERT INTO studentlog(studentId, studentName, studentStatus) VALUES ('%s', '%s', '%s')",studentId, studentName, status);
@@ -296,7 +294,6 @@ public class AdminPanel extends JPanel {
         String courseCode = courseCodeField.getText();
         String courseCredit = courseCreditField.getText();
 
-        // TODO: Add code to insert the course data into the CoursesLog table
         tablePopulate();
         try {
             String adder = String.format("INSERT INTO courseslog(courseId, courseTitle, courseCredit) VALUES ('%s', '%s', '%s')",courseName, courseCode, courseCredit);
