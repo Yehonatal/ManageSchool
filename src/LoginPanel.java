@@ -3,44 +3,42 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Login extends JFrame {
+public class LoginPanel extends JPanel {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JCheckBox adminCheckBox;
     private JCheckBox studentCheckBox;
     private JButton loginButton;
+    private App parentApp;
 
-    public Login() {
-        setTitle("Login Page");
-        setSize(450, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public LoginPanel(App app) {
+        parentApp = app;
 
-        // Create a panel with GridBagLayout for centering
-        JPanel centerPanel = new JPanel(new GridBagLayout());
+        setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        centerPanel.add(new JLabel("Username:"), gridBagConstraints);
+        add(new JLabel("Username:"), gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         usernameField = new JTextField(20);
-        centerPanel.add(usernameField, gridBagConstraints);
+        add(usernameField, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        centerPanel.add(new JLabel("Password:"), gridBagConstraints);
+        add(new JLabel("Password:"), gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         passwordField = new JPasswordField(20);
-        centerPanel.add(passwordField, gridBagConstraints);
+        add(passwordField, gridBagConstraints);
 
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -51,17 +49,14 @@ public class Login extends JFrame {
         JPanel userTypePanel = new JPanel();
         userTypePanel.add(adminCheckBox);
         userTypePanel.add(studentCheckBox);
-        centerPanel.add(userTypePanel, gridBagConstraints);
+        add(userTypePanel, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         loginButton = new JButton("Login");
-        centerPanel.add(loginButton, gridBagConstraints);
-
-        // Add the center panel to the content pane
-        getContentPane().add(centerPanel, BorderLayout.CENTER);
+        add(loginButton, gridBagConstraints);
 
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -88,15 +83,12 @@ public class Login extends JFrame {
                     if (result.equals("true")) {
                         JOptionPane.showMessageDialog(null, "Login Successful!");
 
-                        dispose();
-                            // Open the appropriate window based on user type
-                            if (adminCheckBox.isSelected()) {
-                                AdminWindow adminWindow = new AdminWindow();
-                                adminWindow.setVisible(true);
-                            } else if (studentCheckBox.isSelected()) {
-                                StudentWindow studentWindow = new StudentWindow();
-                                studentWindow.setVisible(true);
-                            }
+                        // Switch to the appropriate panel based on user type
+                        if (adminCheckBox.isSelected()) {
+                            parentApp.switchPanel(new AdminPanel());
+                        } else if (studentCheckBox.isSelected()) {
+                            parentApp.switchPanel(new StudentPanel());
+                        }
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please check your credentials.");
                     }
@@ -104,6 +96,4 @@ public class Login extends JFrame {
             }
         });
     }
-
 }
-               
