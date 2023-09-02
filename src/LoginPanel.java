@@ -85,9 +85,9 @@ public class LoginPanel extends JPanel {
 
                         // Switch to the appropriate panel based on user type
                         if (adminCheckBox.isSelected()) {
-                            parentApp.switchPanel(new AdminPanel());
+                            parentApp.switchPanel(new AdminPanel(parentApp));
                         } else if (studentCheckBox.isSelected()) {
-                            parentApp.switchPanel(new StudentPanel());
+                            parentApp.switchPanel(new StudentPanel(parentApp));
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "Login Failed. Please check your credentials.");

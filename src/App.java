@@ -6,7 +6,7 @@ public class App extends JFrame {
 
     public App() {
         setTitle("ManageSchool");
-        setSize(600, 300);
+        setSize(950, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
