@@ -1,12 +1,14 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class StudentPanel extends JPanel {
     private App parentApp;
     private JTabbedPane tabbedPane;
+    Connection con;
+    Statement statement;
 
     // Components for enrolling in courses
     private JTable availableCoursesTable;
@@ -98,12 +100,35 @@ public class StudentPanel extends JPanel {
         return button;
     }
 
+    private void tablePopulate() {
+        try {
+            if (con == null || con.isClosed()) {
+                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/manageschool", "sqluser", "password");
+            }
+            if (statement == null || statement.isClosed()) {
+                statement = con.createStatement();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
     private void populateAvailableCoursesTable() {
-        // TODO: Implement this method to fetch and populate available courses into the availableCoursesTable
-        // Random data for now:
-        DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
-        model.addRow(new Object[] {"C001", "Course 1", "3"});
-        model.addRow(new Object[] {"C002", "Course 2", "4"});
+        tablePopulate();
+        try {
+            String grabber = "SELECT * FROM courseslog";
+            ResultSet resultSet = statement.executeQuery(grabber);
+
+            while (resultSet.next()) {
+                String courseId = resultSet.getString("courseId");
+                String courseTitle = resultSet.getString("courseTitle");
+                String courseCredit = resultSet.getString("courseCredit");
+                DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
+                model.addRow(new Object[] {courseId, courseTitle, courseCredit});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } 
     }
 
     private void populateEnrolledCoursesTable() {
@@ -117,4 +142,6 @@ public class StudentPanel extends JPanel {
     private void enrollInCourse() {
         // TODO: Implement enroll
     }
+
+    
 }

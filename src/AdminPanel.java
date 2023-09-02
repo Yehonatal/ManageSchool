@@ -3,10 +3,13 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class AdminPanel extends JPanel {
     private App parentApp;
     private JTabbedPane tabbedPane;
+    Connection con;
+    Statement statement;
 
     // Components for adding students
     private JTextField studentNameField;
@@ -64,7 +67,6 @@ public class AdminPanel extends JPanel {
         JPanel createCoursePanel = new JPanel(new BorderLayout());
         tabbedPane.addTab("Create Courses", null, createCoursePanel, "Create Courses");
 
-        // Create and set up the available courses table in the "Create Courses" tab
         DefaultTableModel availableCoursesTableModel = new DefaultTableModel();
         availableCoursesTableModel.addColumn("Course ID");
         availableCoursesTableModel.addColumn("Course Name");
@@ -72,7 +74,6 @@ public class AdminPanel extends JPanel {
         availableCoursesTable = new JTable(availableCoursesTableModel);
         JScrollPane availableCoursesScrollPane = new JScrollPane(availableCoursesTable);
 
-        // Make the table read-only
         availableCoursesTable.setDefaultEditor(Object.class, null);
 
         // Populate available courses
@@ -81,13 +82,11 @@ public class AdminPanel extends JPanel {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(availableCoursesScrollPane, BorderLayout.CENTER);
 
-        // Create a split pane to divide the space vertically
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setResizeWeight(1.0); // Make the top component (table) take the whole space
+        splitPane.setResizeWeight(1.0); 
 
-        splitPane.setTopComponent(tablePanel); // Add the table to the top
-        splitPane.setBottomComponent(createCourseFormPanel()); // Add the form to the bottom
-
+        splitPane.setTopComponent(tablePanel); 
+        splitPane.setBottomComponent(createCourseFormPanel()); 
         createCoursePanel.add(splitPane, BorderLayout.CENTER);
     }
 
@@ -106,13 +105,36 @@ public class AdminPanel extends JPanel {
 
         return formPanel;
     }
+    private void tablePopulate() {
+        try {
+            if (con == null || con.isClosed()) {
+                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/manageschool", "sqluser", "password");
+            }
+            if (statement == null || statement.isClosed()) {
+                statement = con.createStatement();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void populateAvailableCoursesTable() {
-        // TODO: Implement this method to fetch and populate available courses into the availableCoursesTable
-        // Random data for now:
-        DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
-        model.addRow(new Object[]{"C001", "Course 1", "3"});
-        model.addRow(new Object[]{"C002", "Course 2", "4"});
+        tablePopulate();
+        try {
+            String grabber = "SELECT * FROM courseslog";
+            ResultSet resultSet = statement.executeQuery(grabber);
+            while (resultSet.next()) {
+                String courseId = resultSet.getString("courseId");
+                String courseTitle = resultSet.getString("courseTitle");
+                String courseCredit = resultSet.getString("courseCredit");
+                DefaultTableModel model = (DefaultTableModel) availableCoursesTable.getModel();
+                model.addRow(new Object[] {courseId, courseTitle, courseCredit});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching data from the database", "Database Error", JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
     private void setupAssignGradesTab() {

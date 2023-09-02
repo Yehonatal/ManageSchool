@@ -18,8 +18,11 @@ INSERT INTO CoursesLog VALUES (101, 'advancedProgramming', '3');
 INSERT INTO advancedProgramming VALUES (101, 'A');
 
 -- A junction table for associating students with courses both column which are studentId and CoursesId will be referances 
-CREATE TABLE Enrollments(enrolledStudId INT NOT NULL, enrolledCourseId INT NOT NULL, studentCourseGrade CHAR,
-FOREIGN KEY(enrolledStudId) REFERENCES StudentLog(studentId),
-FOREIGN KEY(enrolledCourseId) REFERENCES CoursesLog(courseId));
-
-INSERT INTO Enrollments VALUES (101, 101, 'A');
+CREATE TABLE student_course (
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    course_id INT,
+    grade VARCHAR(2) DEFAULT 'A', -- Set the default value to 'A'
+    FOREIGN KEY (student_id) REFERENCES studentlog(studentId),
+    FOREIGN KEY (course_id) REFERENCES courseslog(courseId)
+);
