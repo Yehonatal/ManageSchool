@@ -22,6 +22,7 @@ public class AdminPanel extends JPanel {
     private JTextField assignCourseIdField;
     private JTextField gradeField;
 
+
     public AdminPanel(App app) {
         parentApp = app;
         setupUI();
@@ -55,8 +56,9 @@ public class AdminPanel extends JPanel {
         JButton addStudentButton = createButton("Add Student", e -> addStudent());
 
         addComponentsToPanel(addStudentPanel, studentNameField, "Student Name:", 0, 0);
-        addComponentsToPanel(addStudentPanel, studentIdField, "Student ID:", 1, 0);
-        addComponentsToPanel(addStudentPanel, studentStatusCheckBox, "Student Status:", 2, 0);
+        addComponentsToPanel(addStudentPanel, studentIdField, "Student ID:", 0, 1);
+        addComponentsToPanel(addStudentPanel, studentStatusCheckBox, "Student Status:", 0, 2);
+        addComponentsToPanel(addStudentPanel, studentStatusCheckBox, 2, 1);
         addComponentsToPanel(addStudentPanel, addStudentButton, 1, 3);
     }
 
@@ -70,8 +72,8 @@ public class AdminPanel extends JPanel {
         JButton createCourseButton = createButton("Create Course", e -> createCourse());
 
         addComponentsToPanel(createCoursePanel, courseNameField, "Course Title:", 0, 0);
-        addComponentsToPanel(createCoursePanel, courseCodeField, "Course Code:", 1, 0);
-        addComponentsToPanel(createCoursePanel, courseCreditField, "Course Credit:", 2, 0);
+        addComponentsToPanel(createCoursePanel, courseCodeField, "Course Code:", 0, 1);
+        addComponentsToPanel(createCoursePanel, courseCreditField, "Course Credit:", 0, 2);
         addComponentsToPanel(createCoursePanel, createCourseButton, 1, 3);
     }
 
@@ -85,8 +87,8 @@ public class AdminPanel extends JPanel {
         JButton assignGradeButton = createButton("Assign Grade", e -> assignGrade());
 
         addComponentsToPanel(assignGradesPanel, assignStudentIdField, "Select Student:", 0, 0);
-        addComponentsToPanel(assignGradesPanel, assignCourseIdField, "Select Course:", 1, 0);
-        addComponentsToPanel(assignGradesPanel, gradeField, "Enter Grade:", 2, 0);
+        addComponentsToPanel(assignGradesPanel, assignCourseIdField, "Select Course:", 0, 1);
+        addComponentsToPanel(assignGradesPanel, gradeField, "Enter Grade:", 0, 2);
         addComponentsToPanel(assignGradesPanel, assignGradeButton, 1, 3);
     }
 
@@ -103,20 +105,45 @@ public class AdminPanel extends JPanel {
         return button;
     }
 
-    private void addComponentsToPanel(JPanel panel, JComponent component, String label, int gridx, int gridy) {
+    private void addComponentsToPanel(JPanel panel, Component component, int gridx, int gridy) {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.gridx = gridx;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.fill = (gridy == 3) ? GridBagConstraints.HORIZONTAL : GridBagConstraints.NONE;
+        gridBagConstraints.gridwidth = 1;
 
-        if (!label.isEmpty()) {
-            panel.add(new JLabel(label), gridBagConstraints);
-            gridBagConstraints.gridx++;
+        if (component instanceof JButton) {
+            panel.add((JButton) component, gridBagConstraints);
         }
-
-        panel.add(component, gridBagConstraints);
     }
+
+    private void addComponentsToPanel(JPanel panel, Component component, String labelText, int gridx, int gridy) {
+        GridBagConstraints labelConstraints = new GridBagConstraints();
+        labelConstraints.insets = new Insets(5, 5, 5, 5);
+        labelConstraints.gridx = gridx;
+        labelConstraints.gridy = gridy;
+        labelConstraints.anchor = GridBagConstraints.WEST;
+
+        GridBagConstraints componentConstraints = new GridBagConstraints();
+        componentConstraints.insets = new Insets(5, 5, 5, 5);
+        componentConstraints.gridx = gridx + 1;
+        componentConstraints.gridy = gridy;
+        componentConstraints.fill = GridBagConstraints.HORIZONTAL;
+        componentConstraints.anchor = GridBagConstraints.WEST;
+
+        if (component instanceof JTextField || component instanceof JCheckBox) {
+            panel.add(new JLabel(labelText), labelConstraints); 
+            panel.add(component, componentConstraints); 
+        } else if (component instanceof JButton) {
+            componentConstraints.gridwidth = 2; 
+            panel.add(component, componentConstraints); 
+        }
+    }
+
+
+
+
+
 
     private JPanel createLogoutPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
