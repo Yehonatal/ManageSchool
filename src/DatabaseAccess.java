@@ -37,22 +37,22 @@ public class DatabaseAccess {
     }
 
     public String selectData(String user, String psw, String table) {
-    ResultSet result;
-    try {
-        PreparedStatement preparedStatement = conn.prepareStatement(
-                String.format("SELECT * FROM %s WHERE %s = ? AND %s = ?", table, user, psw)
-        );
-        preparedStatement.setString(1, userName);
-        preparedStatement.setString(2, password);
-        result = preparedStatement.executeQuery();
+        ResultSet result;
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    String.format("SELECT * FROM %s WHERE %s = ? AND %s = ?", table, user, psw)
+            );
+            preparedStatement.setString(1, userName);
+            preparedStatement.setString(2, password);
+            result = preparedStatement.executeQuery();
 
-        if (result.next()) {
-            return "true";
+            if (result.next()) {
+                return "true";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return "false";
     }
-    return "false";
-}
 
 }
